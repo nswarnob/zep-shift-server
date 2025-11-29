@@ -31,8 +31,9 @@ async function run() {
     //parcel api
     app.get("/parcel", async (req, res) => {
       const email = req.query.email;
+      const options = { sort: { createdAt: -1 } };
       const result = await parcelCollection
-        .find({ senderEmail: email })
+        .find({ senderEmail: email }, options)
         .toArray();
       res.send(result);
     });
