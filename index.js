@@ -3,7 +3,7 @@ const cors = require("cors");
 const app = express();
 require("dotenv").config();
 const { MongoClient, ServerApiVersion } = require("mongodb");
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5000;
 
 //middleware
 app.use(express.json());
@@ -25,10 +25,23 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
+    const db = client.db("zap-shift-db");
+    const parcelCollection = db.collection("parcels");
 
+    //parcel api
+    app.get("/parcel", async (req, res) => {
+      const email = req.query.email;
+      const result = await parcelCollection
+        .find({ senderEmail: email })
+        .toArray();
+      res.send(result);
+    });
 
-
-    
+    app.post("/send-parcel", async (req, res) => {
+      const parcel = req.body;
+      const result = await parcelCollection.insertOne(parcel);
+      res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
